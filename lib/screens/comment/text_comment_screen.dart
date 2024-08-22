@@ -15,7 +15,6 @@ class TextCommentScreen extends StatefulWidget {
   final int end;
   final String selectedText;
 
-
   TextCommentScreen({required this.bookId, required this.chapterId, required this.start, required this.end, required this.selectedText});
   
   @override
@@ -53,32 +52,34 @@ class _TextCommentScreenState extends State<TextCommentScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      final args = route.settings.arguments as Map<String, dynamic>?;
+      if (args != null) {
+        setState(() {
+          bookId = args['bookId'] ?? '';
+          chapterId = args['chapterId'] ?? '';
+          start = args['start'] ?? 0;
+          end = args['end'] ?? 0;
+          selectedText = args['selectedText'] ?? ''; // 選択テキストを取得
+        });
+        _saveArgsToPreferences(args);
 
-    if (args != null) {
-      setState(() {
-        bookId = args['bookId'] ?? '';
-        chapterId = args['chapterId'] ?? '';
-        start = args['start'] ?? 0;
-        end = args['end'] ?? 0;
-        selectedText = args['selectedText'] ?? ''; // 選択テキストを取得
-      });
-      _saveArgsToPreferences(args);
+        // 引数のログ出力
+        print('Received bookId: $bookId, chapterId: $chapterId, start: $start, end: $end, selectedText: $selectedText');
 
-      // 引数のログ出力
-      print('Received bookId: $bookId, chapterId: $chapterId, start: $start, end: $end, selectedText: $selectedText');
-
-      // コメントをリアルタイムで取得
-      Provider.of<CommentReplyProvider>(context, listen: false).loadSelectedTextComments(bookId, chapterId, start, end);
-    } else {
-      setState(() {
-        bookId = '';
-        chapterId = '';
-        start = 0;
-        end = 0;
-        selectedText = '';
-      });
-      print('引数が正しく渡されていません');
+        // コメントをリアルタイムで取得
+        Provider.of<CommentReplyProvider>(context, listen: false).loadSelectedTextComments(bookId, chapterId, start, end);
+      } else {
+        setState(() {
+          bookId = '';
+          chapterId = '';
+          start = 0;
+          end = 0;
+          selectedText = '';
+        });
+        print('引数が正しく渡されていません');
+      }
     }
   }
 
@@ -114,9 +115,11 @@ class _TextCommentScreenState extends State<TextCommentScreen> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       final userSnapshot = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
-      setState(() {
-        _currentUserProfileImage = userSnapshot['profileImageUrl'] ?? 'https://via.placeholder.com/150';
-      });
+      if (userSnapshot.exists) {
+        setState(() {
+          _currentUserProfileImage = userSnapshot.data()?['profileImageUrl'] ?? 'https://dummyimage.com/150';
+        });
+      }
     }
   }
 
@@ -177,7 +180,7 @@ class _TextCommentScreenState extends State<TextCommentScreen> {
             if (provider.comments.isEmpty) {
               return Center(child: CircularProgressIndicator());
             }
-            // コメントが取得された合、ログを出力
+            // コメントが取得された場合、ログを出力
             print('Received comments: ${provider.comments.map((comment) => comment.data()).toList()}');
             // コメントが取得された場合
             return TextCommentList(bookId: widget.bookId, chapterId: widget.chapterId, start: start, end: end);
@@ -193,7 +196,7 @@ class _TextCommentScreenState extends State<TextCommentScreen> {
                     : null,
                 child: _currentUserProfileImage == null
                     ? ProfilePicture(
-                        name: FirebaseAuth.instance.currentUser!.displayName ?? 'User',
+                        name: FirebaseAuth.instance.currentUser?.displayName ?? 'User',
                         radius: 31,
                         fontsize: 21,
                         random: true,

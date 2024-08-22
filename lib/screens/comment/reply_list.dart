@@ -52,7 +52,7 @@ class ReplyList extends StatelessWidget {
                   if (!replyUserSnapshot.hasData) {
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+                        backgroundImage: NetworkImage('https://dummyimage.com/150'),
                       ),
                       title: Text('Unknown User'),
                       subtitle: Text(replyData['reply'] ?? 'No reply'),
@@ -61,7 +61,7 @@ class ReplyList extends StatelessWidget {
                   if (replyUserSnapshot.hasError) {
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+                        backgroundImage: NetworkImage('https://dummyimage.com/150'),
                       ),
                       title: Text('Error'),
                       subtitle: Text(replyData['reply'] ?? 'No reply'),
@@ -73,7 +73,7 @@ class ReplyList extends StatelessWidget {
                   if (replyUserData == null) {
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+                        backgroundImage: NetworkImage('https://dummyimage.com/150'),
                       ),
                       title: Text('ユーザーデータがありません'),
                       subtitle: Text('このユーザーデータは存在しません。'),
@@ -92,7 +92,7 @@ class ReplyList extends StatelessWidget {
                           CircleAvatar(
                             backgroundImage: replyUserProfileImage.isNotEmpty
                                 ? NetworkImage(replyUserProfileImage)
-                                : null,
+                                : NetworkImage('https://dummyimage.com/150'),
                             child: replyUserProfileImage.isEmpty
                                 ? ProfilePicture(
                                     name: replyUsername,
