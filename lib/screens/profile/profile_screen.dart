@@ -59,6 +59,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return true;
   }
 
+  void _showFullTextDialog(Map<String, dynamic> savedText) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('保存したテキスト'),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Text(savedText['selected_text']),
+          ),
+          actions: [
+            Center(
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(
+                    context,
+                    '/reading',
+                    arguments: {'id': savedText['book_id']},
+                  );
+                },
+                child: Text('読書ページに移動'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (user == null) {
@@ -346,11 +386,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/bookdetails',
-                    arguments: {'id': savedText['book_id']},
-                  );
+                  _showFullTextDialog(savedText);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -374,8 +410,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             : null,
                       ),
                       SizedBox(width: 24),
-                      Container(
-                        width: 300,
+                      Expanded(
                         child: Text(
                           savedText['selected_text'],
                           style: TextStyle(fontSize: 14),

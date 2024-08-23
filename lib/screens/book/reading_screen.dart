@@ -73,53 +73,76 @@ class _ReadingScreenState extends State<ReadingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('コメントを追加'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start, // 左寄せに設定
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(selectedText),
-              TextField(
-                controller: _commentController,
-                decoration: InputDecoration(labelText: 'コメントを入力'),
+              Text('コメント'),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _isDialogVisible = false;
+                },
               ),
             ],
           ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start, // 左寄せに設定
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(selectedText),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.save),
+                      onPressed: () {
+                        _saveSelectedText(chapterId, selectedText, start, end);
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _commentController,
+                        decoration: InputDecoration(
+                          labelText: 'コメントを入力',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: null,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.send),
+                      onPressed: () {
+                        _addComment(chapterId, selectedText, start, end);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
           actions: [
-            TextButton(
-              onPressed: () {
-                _addComment(chapterId, selectedText, start, end);
-                Navigator.pop(context);
-                _isDialogVisible = false;
-              },
-              child: Text('コメント'),
-            ),
-            TextButton(
-              onPressed: () {
-                _saveSelectedText(chapterId, selectedText, start, end);
-                Navigator.pop(context);
-                _isDialogVisible = false;
-              },
-              child: Text('テキスト保存'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _isDialogVisible = false;
-                Navigator.pushNamed(
-                  context,
-                  '/text_comment',
-                  arguments: {'bookId': book!['id'], 'chapterId': chapterId, 'start': start, 'end': end, 'selectedText': selectedText},
-                );
-              },
-              child: Text('コメントを見る'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _isDialogVisible = false;
-              },
-              child: Text('キャンセル'),
+            Center(
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _isDialogVisible = false;
+                  Navigator.pushNamed(
+                    context,
+                    '/text_comment',
+                    arguments: {'bookId': book!['id'], 'chapterId': chapterId, 'start': start, 'end': end, 'selectedText': selectedText},
+                  );
+                },
+                child: Text('コメントを見る'),
+              ),
             ),
           ],
         );
@@ -273,7 +296,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                                           ),
                                           if (commentCount > 0)
                                             TextSpan(
-                                              text: ' ($commentCount)',
+                                              text: '[$commentCount]　',
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey,

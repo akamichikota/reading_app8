@@ -180,22 +180,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 24.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  '/reading',
-                  arguments: book,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange, // 背景色を変更
-                foregroundColor: Colors.white, // 文字色を白にする
-                minimumSize: Size(double.infinity, 50), // 幅いっぱいに広げる
-              ),
-              child: Text('個人で読む', style: TextStyle(color: Colors.white)),
-            ),
             SizedBox(height: 12.0),
             ElevatedButton(
               onPressed: () {
